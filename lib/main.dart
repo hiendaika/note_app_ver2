@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:note_app_ver2/models/note_database.dart';
 import 'package:note_app_ver2/pages/note_page.dart';
+import 'package:note_app_ver2/pages/settings_page.dart';
 import 'package:note_app_ver2/theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -8,6 +9,7 @@ void main() async {
   //initialize the database
   WidgetsFlutterBinding.ensureInitialized();
   await NoteDatabase.initialize();
+
   runApp(
     MultiProvider(
       providers: [
@@ -31,6 +33,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: NotePage(),
       theme: Provider.of<ThemeProvider>(context).themeData,
+      routes: {
+        '/notes_page': (context) => NotePage(),
+        '/settings_page': (context) => const SettingsPage(),
+      },
     );
   }
 }

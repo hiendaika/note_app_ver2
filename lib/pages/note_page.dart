@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:note_app_ver2/components/drawer.dart';
+import 'package:note_app_ver2/components/note_tile.dart';
 import 'package:note_app_ver2/models/note.dart';
 import 'package:note_app_ver2/models/note_database.dart';
 import 'package:provider/provider.dart';
@@ -12,10 +15,16 @@ class NotePage extends StatefulWidget {
 
 class _NotePageState extends State<NotePage> {
   @override
-  void setState(VoidCallback fn) {
-    super.setState(fn);
+  void initState() {
     //When app start read notes
     readNotes();
+    super.initState();
+  }
+
+  @override
+  void setState(VoidCallback fn) {
+    super.setState(fn);
+    // readNotes();
   }
 
   final TextEditingController myController = TextEditingController();
@@ -55,7 +64,7 @@ class _NotePageState extends State<NotePage> {
 
   // read notes
   void readNotes() {
-    context.watch<NoteDatabase>().fetchNotes();
+    context.read<NoteDatabase>().fetchNotes();
   }
 
   //update note
@@ -104,6 +113,7 @@ class _NotePageState extends State<NotePage> {
   Widget build(BuildContext context) {
     //Note database
     NoteDatabase database = context.watch<NoteDatabase>();
+
     //Current notes
     List<Note> currentNotes = database.currentNotes;
 
@@ -111,19 +121,29 @@ class _NotePageState extends State<NotePage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
+        foregroundColor: Theme.of(context).colorScheme.inversePrimary,
         centerTitle: true,
       ),
+      drawer: MyDrawer(),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body:
           currentNotes.isEmpty
               ? Center(
                 child: const Text('No notes', style: TextStyle(fontSize: 20)),
               )
               : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   //Header
                   Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: const Text('Notes'),
+                    padding: const EdgeInsets.only(left: 25.0),
+                    child: Text(
+                      'Notes',
+                      style: GoogleFonts.dmSerifText(
+                        fontSize: 48,
+                        color: Theme.of(context).colorScheme.inversePrimary,
+                      ),
+                    ),
                   ),
                   //List note
                   Expanded(
@@ -133,28 +153,17 @@ class _NotePageState extends State<NotePage> {
                         final note = currentNotes[index];
                         return Card(
                           margin: EdgeInsets.symmetric(
-                            horizontal: 15,
-                            vertical: 10,
+                            horizontal: 18,
+                            vertical: 8,
                           ),
-                          child: ListTile(
-                            title: Text(note.title),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.delete),
-                                  onPressed: () {
-                                    deleteNote(note);
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  onPressed: () {
-                                    updateNote(context, note);
-                                  },
-                                ),
-                              ],
-                            ),
+                          child: NoteTile(
+                            text: note.title,
+                            deleteNote: () {
+                              deleteNote(note);
+                            },
+                            updateNote: () {
+                              updateNote(context, note);
+                            },
                           ),
                         );
                       },
@@ -166,7 +175,10 @@ class _NotePageState extends State<NotePage> {
         onPressed: () {
           createNote(context);
         },
-        child: const Icon(Icons.add),
+        child: Icon(
+          Icons.add,
+          color: Theme.of(context).colorScheme.inversePrimary,
+        ),
       ),
     );
   }
